@@ -1,0 +1,305 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(0.98 0.005 260);
+  --foreground: oklch(0.15 0.01 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.01 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.01 260);
+  --primary: oklch(0.55 0.25 260);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.96 0.01 260);
+  --secondary-foreground: oklch(0.15 0.01 260);
+  --muted: oklch(0.94 0.01 260);
+  --muted-foreground: oklch(0.45 0.02 260);
+  --accent: oklch(0.55 0.25 260);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --border: oklch(0.90 0.01 260);
+  --input: oklch(0.90 0.01 260);
+  --ring: oklch(0.55 0.25 260);
+  --chart-1: oklch(0.55 0.25 260);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.55 0.25 260);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.55 0.25 260);
+}
+
+/* Futuristic Dark Mode - Cyber/Neon Theme */
+.dark {
+  --background: oklch(0.12 0.02 260);
+  --foreground: oklch(0.95 0.02 200);
+  --card: oklch(0.15 0.025 260);
+  --card-foreground: oklch(0.95 0.02 200);
+  --popover: oklch(0.13 0.02 260);
+  --popover-foreground: oklch(0.95 0.02 200);
+  --primary: oklch(0.75 0.18 195);
+  --primary-foreground: oklch(0.12 0.02 260);
+  --secondary: oklch(0.22 0.03 280);
+  --secondary-foreground: oklch(0.95 0.02 200);
+  --muted: oklch(0.20 0.025 270);
+  --muted-foreground: oklch(0.65 0.04 200);
+  --accent: oklch(0.70 0.20 320);
+  --accent-foreground: oklch(0.95 0.02 200);
+  --destructive: oklch(0.60 0.25 25);
+  --destructive-foreground: oklch(0.95 0.02 200);
+  --border: oklch(0.28 0.05 260);
+  --input: oklch(0.20 0.03 260);
+  --ring: oklch(0.75 0.18 195);
+  --chart-1: oklch(0.75 0.18 195);
+  --chart-2: oklch(0.70 0.20 320);
+  --chart-3: oklch(0.65 0.22 145);
+  --chart-4: oklch(0.80 0.15 85);
+  --chart-5: oklch(0.70 0.25 30);
+  --sidebar: oklch(0.10 0.02 260);
+  --sidebar-foreground: oklch(0.95 0.02 200);
+  --sidebar-primary: oklch(0.75 0.18 195);
+  --sidebar-primary-foreground: oklch(0.12 0.02 260);
+  --sidebar-accent: oklch(0.22 0.03 280);
+  --sidebar-accent-foreground: oklch(0.95 0.02 200);
+  --sidebar-border: oklch(0.28 0.05 260);
+  --sidebar-ring: oklch(0.75 0.18 195);
+  
+  /* Futuristic glow colors */
+  --glow-cyan: oklch(0.75 0.18 195);
+  --glow-purple: oklch(0.65 0.25 300);
+  --glow-pink: oklch(0.70 0.20 320);
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), 'Inter', system-ui, sans-serif;
+  --font-mono: var(--font-space), 'Space Grotesk', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s ease-out forwards;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection color */
+::selection {
+  background-color: oklch(0.55 0.25 260 / 0.3);
+}
+
+.dark ::selection {
+  background-color: oklch(0.75 0.18 195 / 0.4);
+}
+
+/* Futuristic Dark Mode Effects */
+.dark .glow-text {
+  text-shadow: 0 0 10px oklch(0.75 0.18 195 / 0.8), 0 0 20px oklch(0.75 0.18 195 / 0.4);
+}
+
+.dark .glow-box {
+  box-shadow: 0 0 20px oklch(0.75 0.18 195 / 0.3), 
+              0 0 40px oklch(0.75 0.18 195 / 0.15),
+              inset 0 1px 0 oklch(1 0 0 / 0.1);
+}
+
+.dark .glow-border {
+  border-color: oklch(0.75 0.18 195 / 0.5);
+  box-shadow: 0 0 15px oklch(0.75 0.18 195 / 0.3);
+}
+
+.dark .neon-line {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    oklch(0.75 0.18 195) 50%, 
+    transparent 100%);
+  height: 1px;
+  box-shadow: 0 0 10px oklch(0.75 0.18 195 / 0.8);
+}
+
+/* Animated grid background for dark mode */
+.dark .cyber-grid {
+  background-image: 
+    linear-gradient(oklch(0.75 0.18 195 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.75 0.18 195 / 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Scanline effect */
+.dark .scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    oklch(0 0 0 / 0.03) 2px,
+    oklch(0 0 0 / 0.03) 4px
+  );
+  pointer-events: none;
+}
+
+/* Holographic shimmer */
+@keyframes holographic {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.dark .holographic {
+  background: linear-gradient(
+    135deg,
+    oklch(0.75 0.18 195 / 0.1) 0%,
+    oklch(0.70 0.20 320 / 0.1) 25%,
+    oklch(0.65 0.25 300 / 0.1) 50%,
+    oklch(0.70 0.20 320 / 0.1) 75%,
+    oklch(0.75 0.18 195 / 0.1) 100%
+  );
+  background-size: 200% 200%;
+  animation: holographic 8s ease infinite;
+}
+
+/* Glowing pulse animation */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px oklch(0.75 0.18 195 / 0.5), 
+                0 0 10px oklch(0.75 0.18 195 / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px oklch(0.75 0.18 195 / 0.8), 
+                0 0 30px oklch(0.75 0.18 195 / 0.5);
+  }
+}
+
+.dark .glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Futuristic card hover in dark mode */
+.dark .futuristic-card {
+  background: linear-gradient(135deg, oklch(0.15 0.025 260) 0%, oklch(0.18 0.03 280) 100%);
+  border: 1px solid oklch(0.75 0.18 195 / 0.2);
+  transition: all 0.3s ease;
+}
+
+.dark .futuristic-card:hover {
+  border-color: oklch(0.75 0.18 195 / 0.5);
+  box-shadow: 0 0 30px oklch(0.75 0.18 195 / 0.2),
+              0 20px 40px oklch(0 0 0 / 0.3);
+  transform: translateY(-2px);
+}
