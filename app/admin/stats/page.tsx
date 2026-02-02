@@ -54,32 +54,25 @@ export default function CompanyStatsPage() {
       const data = await response.json()
       console.log('[v0] Data received:', data)
       
-      // Handle array response
-      if (Array.isArray(data.data)) {
-        console.log('[v0] Setting stats from array:', data.data)
+      // Use defaults if data is empty or not returned
+      const defaultStats = [
+        { id: 'clients_satisfied', stat_key: 'clients_satisfied', value: 89 },
+        { id: 'projects_delivered', stat_key: 'projects_delivered', value: 149 },
+        { id: 'team_members', stat_key: 'team_members', value: 23 },
+        { id: 'years_experience', stat_key: 'years_experience', value: 6 },
+        { id: 'clients_served', stat_key: 'clients_served', value: 500 },
+        { id: 'success_rate', stat_key: 'success_rate', value: 98 },
+        { id: 'team_experts', stat_key: 'team_experts', value: 50 },
+        { id: 'years_excellence', stat_key: 'years_excellence', value: 10 },
+      ]
+      
+      // If data is empty array or invalid, use defaults
+      if (Array.isArray(data.data) && data.data.length > 0) {
+        console.log('[v0] Using stats from API:', data.data)
         setStats(data.data)
-      } else if (data.data && typeof data.data === 'object') {
-        // Convert object to array if needed
-        const statsArray = Object.entries(data.data).map(([key, value]) => ({
-          id: key,
-          stat_key: key,
-          value: typeof value === 'number' ? value : 0
-        }))
-        console.log('[v0] Converted to array:', statsArray)
-        setStats(statsArray)
       } else {
-        console.log('[v0] No data found, using defaults')
-        // Set default values if no data
-        setStats([
-          { id: 'clients_satisfied', stat_key: 'clients_satisfied', value: 89 },
-          { id: 'projects_delivered', stat_key: 'projects_delivered', value: 149 },
-          { id: 'team_members', stat_key: 'team_members', value: 23 },
-          { id: 'years_experience', stat_key: 'years_experience', value: 6 },
-          { id: 'clients_served', stat_key: 'clients_served', value: 500 },
-          { id: 'success_rate', stat_key: 'success_rate', value: 98 },
-          { id: 'team_experts', stat_key: 'team_experts', value: 50 },
-          { id: 'years_excellence', stat_key: 'years_excellence', value: 10 },
-        ])
+        console.log('[v0] API returned empty data, using defaults')
+        setStats(defaultStats)
       }
     } catch (error) {
       console.error('[v0] Fetch error:', error)
