@@ -46,9 +46,10 @@ export function RichTextEditor({
   }, [])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target?.[0]
-    if (!file) return
+    const files = e.target.files
+    if (!files || files.length === 0) return
 
+    const file = files[0]
     setIsImageLoading(true)
     try {
       const reader = new FileReader()
