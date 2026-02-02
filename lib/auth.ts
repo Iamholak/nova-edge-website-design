@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt'
+import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
 export async function hashPassword(password: string): Promise<string> {
@@ -147,5 +148,29 @@ export async function deleteSession(token: string) {
     }
   } catch (err) {
     console.error('[v0] Exception in deleteSession:', err)
+  }
+}
+
+export async function checkAuth(request: NextRequest) {
+  try {
+    const token = request.cookies.get('admin_session')?.value
+    
+    if (!token) {
+      console.log('[v0] No session token found')
+      return { authenticated: false, user: null }
+    }
+
+    const user = await getSessionUser(token)
+    
+    if (!user) {
+      console.log('[v0] Invalid or expired session')
+      return { authenticated: false, user: null }
+    }
+
+    console.log('[v0] Session valid for user:', user.email)
+    return { authenticated: true, user }
+  } catch (error) {
+    console.error('[v0] Auth check error:', error)
+    return { authenticated: false, user: null }
   }
 }
