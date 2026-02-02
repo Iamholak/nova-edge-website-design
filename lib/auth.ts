@@ -160,15 +160,25 @@ export async function checkAuth(request: NextRequest) {
       return { authenticated: false, user: null }
     }
 
-    const user = await getSessionUser(token)
-    
-    if (!user) {
+    if (!supabaseAdmin) {
+      console.error('[v0] Admin client not configured')
+      return { authenticated: false, user: null }
+    }
+
+    // Verify the session token exists in the database
+    const { data, error } = await supabaseAdmin
+      .from('admin_sessions')
+      .select('admin_id, admin_users(email)')
+      .eq('token', token)
+      .single()
+
+    if (error || !data) {
       console.log('[v0] Invalid or expired session')
       return { authenticated: false, user: null }
     }
 
-    console.log('[v0] Session valid for user:', user.email)
-    return { authenticated: true, user }
+    console.log('[v0] Session valid')
+    return { authenticated: true, user: data }
   } catch (error) {
     console.error('[v0] Auth check error:', error)
     return { authenticated: false, user: null }
