@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { RichTextEditor } from '@/components/rich-text-editor'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -204,14 +205,14 @@ export default function BlogEditorPage() {
             <label className="block text-sm font-medium text-foreground mb-2">
               Content
             </label>
-            <Textarea
+            <RichTextEditor
               value={post.content}
-              onChange={(e) => setPost({ ...post, content: e.target.value })}
-              placeholder="Write your post content here..."
-              className="rounded-xl min-h-96 resize-none font-mono text-sm"
+              onChange={(content) => setPost({ ...post, content })}
+              placeholder="Write your post content here... Use the toolbar for formatting!"
+              minHeight="500px"
             />
-            <p className="text-muted-foreground text-sm mt-2">
-              Supports basic markdown formatting
+            <p className="text-muted-foreground text-sm mt-3">
+              Use the toolbar above to format text with bold, italic, headings, lists, alignment, and images.
             </p>
           </div>
 

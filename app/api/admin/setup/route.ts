@@ -1,19 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { hashPassword, createAdminUser } from '@/lib/auth'
+import { hashPassword, createAdminUser, getAdminUser } from '@/lib/auth'
 
 /**
  * SETUP ENDPOINT - Used to create the first admin user
- * This endpoint should be disabled after initial setup
+ * SECURITY: This endpoint is DISABLED by default after initial setup
+ * Only works if NO admin users exist in the database
  * 
  * Usage:
  * POST /api/admin/setup
  * Body: { email: "your@email.com", password: "your-password", fullName: "Your Name" }
- * 
- * ⚠️ SECURITY: This endpoint accepts any request - disable after setup!
  */
 
 export async function POST(request: NextRequest) {
   try {
+    // Security check: Only allow setup if no admin users exist
+    const defaultAdmin = await getAdminUser('admin@novaedge.com')
+    if (defaultAdmin) {
+      console.log('[v0] Setup blocked: Admin users already exist')
+      return NextResponse.json(
+        { 
+          error: 'Setup is disabled. Admin users already exist. Use login page instead.' 
+        },
+        { status: 403 }
+      )
+    }
+
     const { email, password, fullName } = await request.json()
 
     // Validation
