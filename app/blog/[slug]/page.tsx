@@ -11,6 +11,7 @@ interface BlogPost {
   title: string
   slug: string
   content: string
+  featured_image?: string
   published_at: string
   author_id: string
 }
@@ -78,6 +79,17 @@ export default function BlogPostPage() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <article>
+          {/* Featured Image */}
+          {post.featured_image && (
+            <div className="mb-8 rounded-2xl overflow-hidden border border-border h-96 bg-muted">
+              <img 
+                src={post.featured_image}
+                alt={post.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          
           <header className="mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
               {post.title}

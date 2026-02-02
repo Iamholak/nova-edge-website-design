@@ -14,10 +14,16 @@ interface CompanyStat {
 }
 
 const statLabels: Record<string, string> = {
-  clients_satisfied: 'Clients Satisfied',
+  // Original admin stats
+  clients_satisfied: 'Client Satisfaction (%)',
   projects_delivered: 'Projects Delivered',
   team_members: 'Team Members',
-  years_experience: 'Years of Experience',
+  years_experience: 'Years of Excellence',
+  // New homepage stats
+  clients_served: 'Clients Served (Homepage)',
+  success_rate: 'Success Rate (%) (Homepage)',
+  team_experts: 'Team Experts (Homepage)',
+  years_excellence: 'Years Excellence (Homepage)',
 }
 
 export default function CompanyStatsPage() {
@@ -28,6 +34,7 @@ export default function CompanyStatsPage() {
 
   useEffect(() => {
     fetchStats()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchStats = async () => {
@@ -38,9 +45,31 @@ export default function CompanyStatsPage() {
         return
       }
       const data = await response.json()
-      setStats(data.data || [])
+      
+      // Convert stats object to array if needed
+      if (data.data && typeof data.data === 'object' && !Array.isArray(data.data)) {
+        const statsArray = Object.entries(data.data).map(([key, value]) => ({
+          id: key,
+          stat_key: key,
+          value: typeof value === 'number' ? value : 0
+        }))
+        setStats(statsArray)
+      } else {
+        setStats(Array.isArray(data.data) ? data.data : [])
+      }
     } catch (error) {
-      console.error('Error fetching stats:', error)
+      console.error('[v0] Error fetching stats:', error)
+      // Set default values including both old and new stats
+      setStats([
+        { id: 'clients_satisfied', stat_key: 'clients_satisfied', value: 89 },
+        { id: 'projects_delivered', stat_key: 'projects_delivered', value: 149 },
+        { id: 'team_members', stat_key: 'team_members', value: 23 },
+        { id: 'years_experience', stat_key: 'years_experience', value: 6 },
+        { id: 'clients_served', stat_key: 'clients_served', value: 500 },
+        { id: 'success_rate', stat_key: 'success_rate', value: 98 },
+        { id: 'team_experts', stat_key: 'team_experts', value: 50 },
+        { id: 'years_excellence', stat_key: 'years_excellence', value: 10 },
+      ])
     } finally {
       setIsLoading(false)
     }
@@ -54,13 +83,19 @@ export default function CompanyStatsPage() {
     setIsSaving(true)
     try {
       for (const stat of stats) {
-        await fetch(`/api/admin/stats/${stat.id}`, {
+        const response = await fetch(`/api/admin/stats/${stat.stat_key}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ value: stat.value }),
         })
+        
+        if (!response.ok) {
+          throw new Error(`Failed to update ${stat.stat_key}`)
+        }
       }
       alert('Statistics updated successfully!')
+      // Reload stats to confirm changes
+      await fetchStats()
     } catch (error) {
       console.error('Error saving stats:', error)
       alert('Error saving statistics')

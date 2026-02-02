@@ -10,6 +10,7 @@ interface BlogPost {
   title: string
   slug: string
   excerpt: string
+  featured_image?: string
   created_at: string
   published_at: string
 }
@@ -68,20 +69,36 @@ export default function BlogPage() {
           <div className="grid gap-8">
             {posts.map((post) => (
               <Link key={post.id} href={`/blog/${post.slug}`}>
-                <div className="bg-card rounded-2xl p-8 border border-border hover:border-primary/50 transition-all cursor-pointer h-full">
-                  <h2 className="text-2xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-                    {post.title}
-                  </h2>
-                  <p className="text-muted-foreground mb-4">{post.excerpt}</p>
-                  <div className="flex items-center justify-between">
-                    <p className="text-muted-foreground text-sm">
-                      {new Date(post.published_at).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </p>
-                    <span className="text-primary font-medium text-sm">Read More →</span>
+                <div className="bg-card rounded-2xl overflow-hidden border border-border hover:border-primary/50 transition-all cursor-pointer h-full flex flex-col sm:flex-row">
+                  {/* Thumbnail */}
+                  {post.featured_image && (
+                    <div className="sm:w-48 sm:h-48 w-full h-40 flex-shrink-0 overflow-hidden bg-muted">
+                      <img 
+                        src={post.featured_image}
+                        alt={post.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Content */}
+                  <div className="p-8 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h2 className="text-2xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                        {post.title}
+                      </h2>
+                      <p className="text-muted-foreground mb-4">{post.excerpt}</p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-muted-foreground text-sm">
+                        {new Date(post.published_at).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </p>
+                      <span className="text-primary font-medium text-sm">Read More →</span>
+                    </div>
                   </div>
                 </div>
               </Link>

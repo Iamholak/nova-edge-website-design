@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { RichTextEditor } from '@/components/rich-text-editor'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -199,19 +200,48 @@ export default function BlogEditorPage() {
             />
           </div>
 
+          {/* Featured Image */}
+          <div className="bg-card rounded-2xl p-6 border border-border">
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Featured Image URL
+            </label>
+            <Input
+              type="text"
+              value={post.featured_image || ''}
+              onChange={(e) => setPost({ ...post, featured_image: e.target.value })}
+              placeholder="https://example.com/image.jpg"
+              className="rounded-xl"
+            />
+            <p className="text-muted-foreground text-sm mt-2">
+              Enter the URL of the image to display as the post thumbnail and header.
+            </p>
+            {post.featured_image && (
+              <div className="mt-4 border border-border rounded-xl overflow-hidden h-48">
+                <img 
+                  src={post.featured_image} 
+                  alt="Featured image preview"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999"%3EInvalid Image%3C/text%3E%3C/svg%3E'
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
           {/* Content */}
           <div className="bg-card rounded-2xl p-6 border border-border">
             <label className="block text-sm font-medium text-foreground mb-2">
               Content
             </label>
-            <Textarea
+            <RichTextEditor
               value={post.content}
-              onChange={(e) => setPost({ ...post, content: e.target.value })}
-              placeholder="Write your post content here..."
-              className="rounded-xl min-h-96 resize-none font-mono text-sm"
+              onChange={(content) => setPost({ ...post, content })}
+              placeholder="Write your post content here... Use the toolbar for formatting!"
+              minHeight="500px"
             />
-            <p className="text-muted-foreground text-sm mt-2">
-              Supports basic markdown formatting
+            <p className="text-muted-foreground text-sm mt-3">
+              Use the toolbar above to format text with bold, italic, headings, lists, alignment, and images.
             </p>
           </div>
 

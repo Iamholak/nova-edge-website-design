@@ -28,16 +28,17 @@ export async function PATCH(
 
   try {
     const { value } = await request.json()
-    const { id } = await params
+    const { id: statKey } = await params
 
     if (!supabaseAdmin) {
       throw new Error('Admin client not configured')
     }
 
+    // Update using stat_key, not id
     const { data, error } = await supabaseAdmin
       .from('company_stats')
       .update({ value, updated_at: new Date().toISOString() })
-      .eq('id', id)
+      .eq('stat_key', statKey)
       .select()
 
     if (error) throw error

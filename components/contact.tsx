@@ -55,8 +55,8 @@ export function Contact() {
         alert('Failed to send message. Please try again.')
       }
     } catch (error) {
-      console.error('Error sending message:', error)
-      alert('Error sending message. Please try again.')
+      console.error('[v0] Error sending message:', error)
+      alert('Failed to send message. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
