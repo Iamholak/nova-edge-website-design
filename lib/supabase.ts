@@ -7,10 +7,10 @@ const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 // Create dummy client if env vars are missing (for development)
 const defaultClient = {
   from: () => ({
-    select: () => ({ data: null, error: new Error('Supabase not configured') }),
-    insert: () => ({ data: null, error: new Error('Supabase not configured') }),
-    update: () => ({ data: null, error: new Error('Supabase not configured') }),
-    delete: () => ({ data: null, error: new Error('Supabase not configured') }),
+    select: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
+    insert: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
+    update: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
+    delete: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
   }),
   auth: { signOut: () => Promise.resolve() },
 }
