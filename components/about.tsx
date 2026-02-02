@@ -29,15 +29,36 @@ export function About() {
     }
 
     // Fetch stats from API
-    fetch('/api/admin/stats')
-      .then(res => res.json())
-      .then(response => {
-        if (response.data) {
-          setStats(response.data)
+    const fetchStats = async () => {
+      try {
+        console.log('[v0] Fetching company stats from API')
+        const response = await fetch('/api/admin/stats')
+        const result = await response.json()
+        
+        console.log('[v0] Stats response:', result)
+        
+        if (result.data) {
+          // Handle both object and array formats
+          if (typeof result.data === 'object' && !Array.isArray(result.data)) {
+            console.log('[v0] Setting stats from object:', result.data)
+            setStats(result.data)
+          } else if (Array.isArray(result.data) && result.data.length > 0) {
+            // Convert array to object if needed
+            const statsObj = result.data.reduce((acc: any, stat: any) => {
+              acc[stat.stat_key] = stat.value
+              return acc
+            }, {})
+            console.log('[v0] Setting stats from array:', statsObj)
+            setStats(statsObj)
+          }
         }
-      })
-      .catch(err => console.error('[v0] Error fetching stats:', err))
+      } catch (err) {
+        console.error('[v0] Error fetching stats:', err)
+        // Keep default stats if fetch fails
+      }
+    }
 
+    fetchStats()
     return () => observer.disconnect()
   }, [])
 

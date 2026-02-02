@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { 
   Bold, 
@@ -10,9 +10,11 @@ import {
   AlignRight, 
   Image as ImageIcon,
   Heading2,
+  Heading1,
   List,
   ListOrdered,
-  Code
+  Code,
+  Link as LinkIcon
 } from 'lucide-react'
 
 interface RichTextEditorProps {
@@ -30,11 +32,32 @@ export function RichTextEditor({
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
   const [isImageLoading, setIsImageLoading] = useState(false)
+  const [isEditorReady, setIsEditorReady] = useState(false)
 
   const execCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value)
     editorRef.current?.focus()
   }
+
+  // Initialize editor on mount
+  useEffect(() => {
+    if (editorRef.current && value && !isEditorReady) {
+      console.log('[v0] Initializing editor with content')
+      editorRef.current.innerHTML = value
+      setIsEditorReady(true)
+    }
+  }, [])
+
+  // Update editor content when value prop changes from external source
+  useEffect(() => {
+    if (editorRef.current && value && isEditorReady) {
+      const currentContent = editorRef.current.innerHTML
+      if (currentContent !== value) {
+        console.log('[v0] Syncing editor content')
+        editorRef.current.innerHTML = value
+      }
+    }
+  }, [value, isEditorReady])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -57,6 +80,15 @@ export function RichTextEditor({
   const handleInput = () => {
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML)
+      console.log('[v0] Editor content updated')
+    }
+  }
+
+  // Initialize editor content when value prop changes
+  const initializeEditor = () => {
+    if (editorRef.current && value && editorRef.current.innerHTML !== value) {
+      editorRef.current.innerHTML = value
+      console.log('[v0] Editor initialized with content')
     }
   }
 
@@ -96,6 +128,16 @@ export function RichTextEditor({
 
         {/* Headings & Lists */}
         <div className="flex gap-1 border-r border-border pr-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => execCommand('formatBlock', 'h1')}
+            className="gap-1"
+            title="Heading 1"
+          >
+            <Heading1 className="w-4 h-4" />
+          </Button>
           <Button
             type="button"
             variant="outline"
@@ -187,6 +229,19 @@ export function RichTextEditor({
               disabled={isImageLoading}
             />
           </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const url = prompt('Enter URL:')
+              if (url) execCommand('createLink', url)
+            }}
+            className="gap-1"
+            title="Add Link"
+          >
+            <LinkIcon className="w-4 h-4" />
+          </Button>
           <Button
             type="button"
             variant="outline"
