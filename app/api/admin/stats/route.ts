@@ -1,64 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { getSessionUser } from '@/lib/auth'
-
-async function checkAuth(request: NextRequest) {
-  const token = request.cookies.get('admin_session')?.value
-  if (!token) {
-    return { authenticated: false, user: null }
-  }
-
-  try {
-    const user = await getSessionUser(token)
-    return { authenticated: !!user, user }
-  } catch {
-    return { authenticated: false, user: null }
-  }
-}
 
 export async function GET(request: NextRequest) {
   try {
-    if (!supabaseAdmin) {
-      // Return default stats if supabase not configured
+    if (!supabaseAdmin || !supabaseAdmin.from) {
       return NextResponse.json({ 
-        data: [{
-          clients_satisfied: 98,
-          projects_delivered: 500,
-          team_members: 50,
-          years_experience: 10,
-        }] 
+        data: {
+          clients_satisfied: 50,
+          projects_delivered: 120,
+          team_members: 15,
+          years_experience: 5,
+        } 
       }, { status: 200 })
     }
 
     const { data, error } = await supabaseAdmin
       .from('company_stats')
-      .select('*')
-      .order('stat_key', { ascending: true })
+      .select('stat_key, value')
 
-    if (error) {
-      console.error('Supabase error:', error)
-      // Return default stats on error
+    if (error || !data) {
+      console.error('[v0] Stats fetch error:', error)
       return NextResponse.json({ 
-        data: [{
-          clients_satisfied: 98,
-          projects_delivered: 500,
-          team_members: 50,
-          years_experience: 10,
-        }] 
+        data: {
+          clients_satisfied: 50,
+          projects_delivered: 120,
+          team_members: 15,
+          years_experience: 5,
+        } 
       }, { status: 200 })
     }
 
-    return NextResponse.json({ data: data || [] }, { status: 200 })
-  } catch (error) {
-    console.error('Error fetching stats:', error)
-    // Return default stats on any error
+    // Convert array of {stat_key, value} to object
+    const stats: any = {}
+    data.forEach((item: any) => {
+      stats[item.stat_key] = item.value
+    })
+
     return NextResponse.json({ 
-      data: [{
-        clients_satisfied: 98,
-        projects_delivered: 500,
-        team_members: 50,
-        years_experience: 10,
-      }] 
+      data: {
+        clients_satisfied: stats.clients_satisfied || 50,
+        projects_delivered: stats.projects_delivered || 120,
+        team_members: stats.team_members || 15,
+        years_experience: stats.years_experience || 5,
+      }
+    }, { status: 200 })
+  } catch (error) {
+    console.error('[v0] Error fetching stats:', error)
+    return NextResponse.json({ 
+      data: {
+        clients_satisfied: 50,
+        projects_delivered: 120,
+        team_members: 15,
+        years_experience: 5,
+      } 
     }, { status: 200 })
   }
 }

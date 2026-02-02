@@ -3,6 +3,10 @@ import { supabase } from '@/lib/supabase'
 
 export async function GET() {
   try {
+    if (!supabase || !supabase.from) {
+      return NextResponse.json({ data: [] }, { status: 200 })
+    }
+
     const { data, error } = await supabase
       .from('blog_posts')
       .select('*')
@@ -10,13 +14,13 @@ export async function GET() {
       .order('published_at', { ascending: false })
 
     if (error) {
-      console.error('Supabase error:', error)
+      console.error('[v0] Blog fetch error:', error)
       return NextResponse.json({ data: [] }, { status: 200 })
     }
 
     return NextResponse.json({ data: data || [] }, { status: 200 })
   } catch (error) {
-    console.error('Error fetching published posts:', error)
+    console.error('[v0] Error fetching published posts:', error)
     return NextResponse.json({ data: [] }, { status: 200 })
   }
 }

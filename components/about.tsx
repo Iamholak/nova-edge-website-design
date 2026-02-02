@@ -31,18 +31,12 @@ export function About() {
     // Fetch stats from API
     fetch('/api/admin/stats')
       .then(res => res.json())
-      .then(data => {
-        if (data.data && data.data.length > 0) {
-          const statData = data.data[0]
-          setStats({
-            clients_satisfied: statData.clients_satisfied || 98,
-            projects_delivered: statData.projects_delivered || 500,
-            team_members: statData.team_members || 50,
-            years_experience: statData.years_experience || 10,
-          })
+      .then(response => {
+        if (response.data) {
+          setStats(response.data)
         }
       })
-      .catch(err => console.error('Error fetching stats:', err))
+      .catch(err => console.error('[v0] Error fetching stats:', err))
 
     return () => observer.disconnect()
   }, [])
