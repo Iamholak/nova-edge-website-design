@@ -31,6 +31,7 @@ export default function CompanyStatsPage() {
   const [stats, setStats] = useState<CompanyStat[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchStats()
@@ -39,16 +40,24 @@ export default function CompanyStatsPage() {
 
   const fetchStats = async () => {
     setIsLoading(true)
+    setError(null)
     try {
       console.log('[v0] Fetching stats from API...')
       const response = await fetch('/api/admin/stats')
       console.log('[v0] Stats API response status:', response.status)
       
       if (!response.ok) {
-        console.error('[v0] Stats API error:', response.status)
+        const errorData = await response.json().catch(() => ({}))
+        console.error('[v0] Stats API error:', response.status, errorData)
+        
         if (response.status === 401) {
+          console.log('[v0] Unauthorized - redirecting to login')
           router.push('/admin/login')
+          return
         }
+        
+        // Show error message instead of redirecting
+        setError(`API Error: ${response.status} - ${errorData?.error || 'Failed to load stats'}`)
         return
       }
       
@@ -71,6 +80,7 @@ export default function CompanyStatsPage() {
       }
     } catch (error) {
       console.error('[v0] Error fetching stats:', error)
+      setError(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
       // Set default values on error
       setStats([
         { id: 'clients_satisfied', stat_key: 'clients_satisfied', value: 89 },
@@ -154,6 +164,13 @@ export default function CompanyStatsPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {error && (
+          <div className="mb-6 p-4 bg-destructive/10 border border-destructive/50 rounded-xl text-destructive">
+            <p className="font-medium">Error Loading Stats</p>
+            <p className="text-sm mt-1">{error}</p>
+          </div>
+        )}
+        
         {isLoading ? (
           <div className="text-center py-12">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />

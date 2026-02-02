@@ -156,7 +156,7 @@ export async function checkAuth(request: NextRequest) {
     const token = request.cookies.get('admin_session')?.value
     
     if (!token) {
-      console.log('[v0] No session token found')
+      console.log('[v0] No session token found in cookies')
       return { authenticated: false, user: null }
     }
 
@@ -165,22 +165,26 @@ export async function checkAuth(request: NextRequest) {
       return { authenticated: false, user: null }
     }
 
-    // Verify the session token exists in the database
+    // Verify the session token exists in the database - don't use .single()
     const { data, error } = await supabaseAdmin
       .from('admin_sessions')
       .select('admin_id, admin_users(email)')
       .eq('token', token)
-      .single()
 
-    if (error || !data) {
-      console.log('[v0] Invalid or expired session')
+    if (error) {
+      console.error('[v0] Database error checking session:', error)
       return { authenticated: false, user: null }
     }
 
-    console.log('[v0] Session valid')
-    return { authenticated: true, user: data }
+    if (!data || data.length === 0) {
+      console.log('[v0] Session token not found in database')
+      return { authenticated: false, user: null }
+    }
+
+    console.log('[v0] Session valid for admin:', data[0].admin_id)
+    return { authenticated: true, user: data[0] }
   } catch (error) {
-    console.error('[v0] Auth check error:', error)
+    console.error('[v0] Auth check exception:', error)
     return { authenticated: false, user: null }
   }
 }
