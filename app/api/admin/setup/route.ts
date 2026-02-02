@@ -32,7 +32,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Create admin user
+    console.log('[v0] Creating admin user with email:', email)
     const user = await createAdminUser(email, password, fullName)
+    console.log('[v0] Admin user created successfully:', user)
 
     return NextResponse.json(
       {
