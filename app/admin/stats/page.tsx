@@ -38,28 +38,40 @@ export default function CompanyStatsPage() {
   }, [])
 
   const fetchStats = async () => {
+    setIsLoading(true)
     try {
+      console.log('[v0] Fetching stats from API...')
       const response = await fetch('/api/admin/stats')
+      console.log('[v0] Stats API response status:', response.status)
+      
       if (!response.ok) {
-        router.push('/admin/login')
+        console.error('[v0] Stats API error:', response.status)
+        if (response.status === 401) {
+          router.push('/admin/login')
+        }
         return
       }
-      const data = await response.json()
       
-      // Convert stats object to array if needed
-      if (data.data && typeof data.data === 'object' && !Array.isArray(data.data)) {
+      const data = await response.json()
+      console.log('[v0] Stats data received:', data)
+      
+      // Handle array response
+      if (Array.isArray(data.data)) {
+        console.log('[v0] Setting stats from array, count:', data.data.length)
+        setStats(data.data)
+      } else if (data.data && typeof data.data === 'object') {
+        // Convert object to array if needed
         const statsArray = Object.entries(data.data).map(([key, value]) => ({
           id: key,
           stat_key: key,
           value: typeof value === 'number' ? value : 0
         }))
+        console.log('[v0] Converted object to array, count:', statsArray.length)
         setStats(statsArray)
-      } else {
-        setStats(Array.isArray(data.data) ? data.data : [])
       }
     } catch (error) {
       console.error('[v0] Error fetching stats:', error)
-      // Set default values including both old and new stats
+      // Set default values on error
       setStats([
         { id: 'clients_satisfied', stat_key: 'clients_satisfied', value: 89 },
         { id: 'projects_delivered', stat_key: 'projects_delivered', value: 149 },
@@ -82,22 +94,42 @@ export default function CompanyStatsPage() {
   const handleSaveAll = async () => {
     setIsSaving(true)
     try {
+      console.log('[v0] Saving all stats, count:', stats.length)
+      let successCount = 0
+      let failureCount = 0
+      
       for (const stat of stats) {
-        const response = await fetch(`/api/admin/stats/${stat.stat_key}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ value: stat.value }),
-        })
-        
-        if (!response.ok) {
-          throw new Error(`Failed to update ${stat.stat_key}`)
+        try {
+          console.log(`[v0] Updating ${stat.stat_key} to ${stat.value}`)
+          const response = await fetch(`/api/admin/stats/${stat.stat_key}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: stat.value }),
+          })
+          
+          if (!response.ok) {
+            console.error(`[v0] Failed to update ${stat.stat_key}:`, response.status)
+            failureCount++
+          } else {
+            successCount++
+          }
+        } catch (error) {
+          console.error(`[v0] Error updating ${stat.stat_key}:`, error)
+          failureCount++
         }
       }
-      alert('Statistics updated successfully!')
-      // Reload stats to confirm changes
-      await fetchStats()
+      
+      console.log(`[v0] Save complete: ${successCount} success, ${failureCount} failures`)
+      
+      if (failureCount === 0) {
+        alert('Statistics updated successfully!')
+        // Reload stats to confirm changes
+        await fetchStats()
+      } else {
+        alert(`Updated ${successCount} stats. ${failureCount} failed to update.`)
+      }
     } catch (error) {
-      console.error('Error saving stats:', error)
+      console.error('[v0] Error in save operation:', error)
       alert('Error saving statistics')
     } finally {
       setIsSaving(false)
