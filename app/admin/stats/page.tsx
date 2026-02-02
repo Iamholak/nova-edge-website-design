@@ -28,6 +28,7 @@ export default function CompanyStatsPage() {
 
   useEffect(() => {
     fetchStats()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchStats = async () => {
@@ -72,13 +73,19 @@ export default function CompanyStatsPage() {
     setIsSaving(true)
     try {
       for (const stat of stats) {
-        await fetch(`/api/admin/stats/${stat.id}`, {
+        const response = await fetch(`/api/admin/stats/${stat.stat_key}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ value: stat.value }),
         })
+        
+        if (!response.ok) {
+          throw new Error(`Failed to update ${stat.stat_key}`)
+        }
       }
       alert('Statistics updated successfully!')
+      // Reload stats to confirm changes
+      await fetchStats()
     } catch (error) {
       console.error('Error saving stats:', error)
       alert('Error saving statistics')

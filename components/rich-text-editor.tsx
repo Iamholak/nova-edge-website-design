@@ -32,40 +32,25 @@ export function RichTextEditor({
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
   const [isImageLoading, setIsImageLoading] = useState(false)
-  const [isEditorReady, setIsEditorReady] = useState(false)
 
   const execCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value)
     editorRef.current?.focus()
   }
 
-  // Initialize editor on mount
+  // Initialize editor content only once on mount
   useEffect(() => {
-    if (editorRef.current && value && !isEditorReady) {
-      console.log('[v0] Initializing editor with content')
+    if (editorRef.current && value && !editorRef.current.innerHTML) {
       editorRef.current.innerHTML = value
-      setIsEditorReady(true)
     }
   }, [])
 
-  // Update editor content when value prop changes from external source
-  useEffect(() => {
-    if (editorRef.current && value && isEditorReady) {
-      const currentContent = editorRef.current.innerHTML
-      if (currentContent !== value) {
-        console.log('[v0] Syncing editor content')
-        editorRef.current.innerHTML = value
-      }
-    }
-  }, [value, isEditorReady])
-
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target?.[0]
     if (!file) return
 
     setIsImageLoading(true)
     try {
-      // Create a temporary data URL for the image
       const reader = new FileReader()
       reader.onload = (event) => {
         const imgSrc = event.target?.result as string
@@ -80,15 +65,6 @@ export function RichTextEditor({
   const handleInput = () => {
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML)
-      console.log('[v0] Editor content updated')
-    }
-  }
-
-  // Initialize editor content when value prop changes
-  const initializeEditor = () => {
-    if (editorRef.current && value && editorRef.current.innerHTML !== value) {
-      editorRef.current.innerHTML = value
-      console.log('[v0] Editor initialized with content')
     }
   }
 
@@ -132,7 +108,7 @@ export function RichTextEditor({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => execCommand('formatBlock', 'h1')}
+            onClick={() => execCommand('formatBlock', '<h1>')}
             className="gap-1"
             title="Heading 1"
           >
@@ -142,7 +118,7 @@ export function RichTextEditor({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => execCommand('formatBlock', 'h2')}
+            onClick={() => execCommand('formatBlock', '<h2>')}
             className="gap-1"
             title="Heading 2"
           >
@@ -246,7 +222,7 @@ export function RichTextEditor({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => execCommand('formatBlock', 'pre')}
+            onClick={() => execCommand('formatBlock', '<pre>')}
             className="gap-1"
             title="Code Block"
           >
@@ -262,9 +238,9 @@ export function RichTextEditor({
         suppressContentEditableWarning
         onInput={handleInput}
         onPaste={handlePaste}
-        className="p-4 focus:outline-none prose prose-sm max-w-none w-full"
+        className="p-4 focus:outline-none prose prose-sm max-w-none w-full text-foreground"
         style={{ minHeight }}
-        dangerouslySetInnerHTML={{ __html: value }}
+        data-placeholder={placeholder}
       />
     </div>
   )
