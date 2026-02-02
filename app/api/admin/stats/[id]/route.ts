@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase, supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function PATCH(
   request: NextRequest,
@@ -11,10 +11,8 @@ export async function PATCH(
 
     console.log(`[v0] PATCH /api/admin/stats/${statKey} - updating to ${value}`)
 
-    const client = supabaseAdmin || supabase
-
-    // Update using stat_key
-    const { data, error } = await client
+    // Use admin client for writes
+    const { data, error } = await supabaseAdmin
       .from('company_stats')
       .update({ value, updated_at: new Date().toISOString() })
       .eq('stat_key', statKey)
@@ -25,7 +23,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Failed to update stat', data: null }, { status: 200 })
     }
 
-    console.log(`[v0] Stat ${statKey} updated successfully`)
+    console.log(`[v0] Stat ${statKey} updated successfully, rows affected:`, data?.length)
     return NextResponse.json({ data, success: true }, { status: 200 })
   } catch (error) {
     console.error('[v0] Error in PATCH /api/admin/stats:', error)
