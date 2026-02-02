@@ -4,14 +4,23 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
+// Create dummy client if env vars are missing (for development)
+const defaultClient = {
+  from: () => ({
+    select: () => ({ data: null, error: new Error('Supabase not configured') }),
+    insert: () => ({ data: null, error: new Error('Supabase not configured') }),
+    update: () => ({ data: null, error: new Error('Supabase not configured') }),
+    delete: () => ({ data: null, error: new Error('Supabase not configured') }),
+  }),
+  auth: { signOut: () => Promise.resolve() },
 }
 
 // Client for browser and server-side operations
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = (supabaseUrl && supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : (defaultClient as any)
 
 // Service role client for admin operations (server-side only)
-export const supabaseAdmin = supabaseServiceRoleKey
+export const supabaseAdmin = (supabaseUrl && supabaseServiceRoleKey)
   ? createClient(supabaseUrl, supabaseServiceRoleKey)
-  : null
+  : (defaultClient as any)
