@@ -86,10 +86,33 @@ export default function GetStartedPage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission
-    setStep(3)
+    
+    try {
+      const response = await fetch('/api/project-inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          company: formData.company,
+          phone: '',
+          projectDescription: formData.description,
+          budget: formData.budget,
+          timeline: formData.timeline,
+        }),
+      })
+
+      if (response.ok) {
+        setStep(3)
+      } else {
+        alert('Failed to submit request. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error submitting request:', error)
+      alert('Error submitting request. Please try again.')
+    }
   }
 
   return (

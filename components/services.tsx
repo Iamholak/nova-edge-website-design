@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { TrendingUp, PieChart, Palette, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 const services = [
   {
@@ -10,18 +11,21 @@ const services = [
     title: "Marketing",
     description: "We deliver strategic, data-driven marketing that strengthens brand presence, engages the right audience, and drives measurable growth.",
     features: ["Brand Strategy", "Digital Campaigns", "Analytics & Insights"],
+    href: "/services/marketing",
   },
   {
     icon: PieChart,
     title: "Finance",
     description: "We provide expert financial solutions that guide smart decisions, optimize resources, and drive sustainable growth.",
     features: ["Financial Planning", "Risk Assessment", "Investment Strategy"],
+    href: "/services/finance",
   },
   {
     icon: Palette,
     title: "Design",
     description: "We deliver creative and user-focused design solutions that engage audiences and strengthen brand identity.",
     features: ["UI/UX Design", "Brand Identity", "Visual Systems"],
+    href: "/services/design",
   },
 ]
 
@@ -117,10 +121,12 @@ export function Services() {
                 </ul>
 
                 {/* Learn More Link */}
-                <div className="flex items-center gap-2 text-primary font-medium text-sm group/link">
-                  <span>Learn More</span>
-                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover/link:translate-x-1 group-hover:translate-x-1" />
-                </div>
+                <Link href={service.href} className="inline-block">
+                  <div className="flex items-center gap-2 text-primary font-medium text-sm group/link">
+                    <span>Learn More</span>
+                    <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover/link:translate-x-1 group-hover:translate-x-1" />
+                  </div>
+                </Link>
               </div>
             </div>
           ))}
