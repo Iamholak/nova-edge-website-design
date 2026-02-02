@@ -53,14 +53,20 @@ export async function getAdminUser(email: string) {
       return null
     }
 
+    console.log('[v0] getAdminUser: Querying for email:', email)
+    
     const { data, error } = await supabaseAdmin
       .from('admin_users')
       .select('*')
       .eq('email', email)
       .single()
 
+    console.log('[v0] getAdminUser response - data:', data, 'error:', error)
+    
     if (error) {
       console.error('[v0] Error fetching admin user:', error)
+      // If error is PGRST116 (0 rows), user doesn't exist
+      // Otherwise, it's a real error
       return null
     }
     return data

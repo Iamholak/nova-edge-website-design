@@ -5,6 +5,8 @@ export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()
 
+    console.log('[v0] Login attempt for email:', email)
+
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
@@ -14,8 +16,10 @@ export async function POST(request: NextRequest) {
 
     // Get user from database
     const user = await getAdminUser(email)
+    console.log('[v0] User found:', user)
 
     if (!user || !user.is_active) {
+      console.log('[v0] User not found or inactive')
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
@@ -23,9 +27,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password
+    console.log('[v0] Verifying password for user:', email)
     const isPasswordValid = await verifyPassword(password, user.password_hash)
+    console.log('[v0] Password valid:', isPasswordValid)
 
     if (!isPasswordValid) {
+      console.log('[v0] Password verification failed')
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
