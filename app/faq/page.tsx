@@ -45,7 +45,7 @@ export default function FAQPage() {
     {
       question: 'How do I get started?',
       answer:
-        'Contact us through our website or email hello@novaedge.com. We'll schedule an initial consultation to understand your business and discuss how we can help.',
+        "Contact us through our website or email hello@novaedge.com. We'll schedule an initial consultation to understand your business and discuss how we can help.",
     },
   ]
 
