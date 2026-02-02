@@ -20,7 +20,7 @@ export default function FAQPage() {
     {
       question: 'What is your typical project timeline?',
       answer:
-        'Project timelines vary based on scope and complexity. Small projects might take 2-4 weeks, while larger initiatives can take several months. During your consultation, we'll provide a detailed timeline specific to your needs.',
+        "Project timelines vary based on scope and complexity. Small projects might take 2-4 weeks, while larger initiatives can take several months. During your consultation, we'll provide a detailed timeline specific to your needs.",
     },
     {
       question: 'Do you offer ongoing support?',
