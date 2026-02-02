@@ -8,10 +8,10 @@ export function About() {
   const sectionRef = useRef<HTMLElement>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [stats, setStats] = useState({
-    clients_satisfied: 98,
-    projects_delivered: 500,
-    team_members: 50,
-    years_experience: 10,
+    clients_served: 500,
+    success_rate: 98,
+    team_experts: 50,
+    years_excellence: 10,
   })
 
   useEffect(() => {
@@ -82,20 +82,20 @@ export function About() {
                 <div className="grid grid-cols-2 gap-4">
                   {/* Stat cards */}
                   <div className="bg-primary/5 rounded-2xl p-6 hover:bg-primary/10 transition-colors duration-300">
-                    <div className="text-4xl font-bold text-primary mb-2">{stats.clients_satisfied}%</div>
-                    <div className="text-sm text-muted-foreground">Client Satisfaction</div>
+                    <div className="text-4xl font-bold text-primary mb-2">{stats.clients_served}+</div>
+                    <div className="text-sm text-muted-foreground">Clients Served</div>
                   </div>
                   <div className="bg-primary/5 rounded-2xl p-6 hover:bg-primary/10 transition-colors duration-300">
-                    <div className="text-4xl font-bold text-primary mb-2">{stats.projects_delivered}+</div>
-                    <div className="text-sm text-muted-foreground">Projects Delivered</div>
+                    <div className="text-4xl font-bold text-primary mb-2">{stats.success_rate}%</div>
+                    <div className="text-sm text-muted-foreground">Success Rate</div>
                   </div>
                   <div className="bg-primary/5 rounded-2xl p-6 hover:bg-primary/10 transition-colors duration-300">
-                    <div className="text-4xl font-bold text-primary mb-2">{stats.team_members}+</div>
-                    <div className="text-sm text-muted-foreground">Team Members</div>
+                    <div className="text-4xl font-bold text-primary mb-2">{stats.team_experts}+</div>
+                    <div className="text-sm text-muted-foreground">Team Experts</div>
                   </div>
                   <div className="bg-primary/5 rounded-2xl p-6 hover:bg-primary/10 transition-colors duration-300">
-                    <div className="text-4xl font-bold text-primary mb-2">{stats.years_experience}+</div>
-                    <div className="text-sm text-muted-foreground">Years of Excellence</div>
+                    <div className="text-4xl font-bold text-primary mb-2">{stats.years_excellence}+</div>
+                    <div className="text-sm text-muted-foreground">Years Experience</div>
                   </div>
                 </div>
               </div>

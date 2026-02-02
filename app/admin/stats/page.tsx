@@ -14,10 +14,16 @@ interface CompanyStat {
 }
 
 const statLabels: Record<string, string> = {
-  clients_satisfied: 'Clients Served (500+)',
-  projects_delivered: 'Success Rate (98%)',
-  team_members: 'Team Experts (50+)',
-  years_experience: 'Years Experience (10+)',
+  // Original admin stats
+  clients_satisfied: 'Client Satisfaction (%)',
+  projects_delivered: 'Projects Delivered',
+  team_members: 'Team Members',
+  years_experience: 'Years of Excellence',
+  // New homepage stats
+  clients_served: 'Clients Served (Homepage)',
+  success_rate: 'Success Rate (%) (Homepage)',
+  team_experts: 'Team Experts (Homepage)',
+  years_excellence: 'Years Excellence (Homepage)',
 }
 
 export default function CompanyStatsPage() {
@@ -53,12 +59,16 @@ export default function CompanyStatsPage() {
       }
     } catch (error) {
       console.error('[v0] Error fetching stats:', error)
-      // Set default values on error matching the image
+      // Set default values including both old and new stats
       setStats([
-        { id: 'clients_satisfied', stat_key: 'clients_satisfied', value: 500 },
-        { id: 'projects_delivered', stat_key: 'projects_delivered', value: 98 },
-        { id: 'team_members', stat_key: 'team_members', value: 50 },
-        { id: 'years_experience', stat_key: 'years_experience', value: 10 },
+        { id: 'clients_satisfied', stat_key: 'clients_satisfied', value: 89 },
+        { id: 'projects_delivered', stat_key: 'projects_delivered', value: 149 },
+        { id: 'team_members', stat_key: 'team_members', value: 23 },
+        { id: 'years_experience', stat_key: 'years_experience', value: 6 },
+        { id: 'clients_served', stat_key: 'clients_served', value: 500 },
+        { id: 'success_rate', stat_key: 'success_rate', value: 98 },
+        { id: 'team_experts', stat_key: 'team_experts', value: 50 },
+        { id: 'years_excellence', stat_key: 'years_excellence', value: 10 },
       ])
     } finally {
       setIsLoading(false)
