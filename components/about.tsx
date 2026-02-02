@@ -7,6 +7,12 @@ import { CheckCircle2 } from "lucide-react"
 export function About() {
   const sectionRef = useRef<HTMLElement>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const [stats, setStats] = useState({
+    clients_satisfied: 98,
+    projects_delivered: 500,
+    team_members: 50,
+    years_experience: 10,
+  })
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -21,6 +27,22 @@ export function About() {
     if (sectionRef.current) {
       observer.observe(sectionRef.current)
     }
+
+    // Fetch stats from API
+    fetch('/api/admin/stats')
+      .then(res => res.json())
+      .then(data => {
+        if (data.data && data.data.length > 0) {
+          const statData = data.data[0]
+          setStats({
+            clients_satisfied: statData.clients_satisfied || 98,
+            projects_delivered: statData.projects_delivered || 500,
+            team_members: statData.team_members || 50,
+            years_experience: statData.years_experience || 10,
+          })
+        }
+      })
+      .catch(err => console.error('Error fetching stats:', err))
 
     return () => observer.disconnect()
   }, [])
@@ -49,19 +71,19 @@ export function About() {
                 <div className="grid grid-cols-2 gap-4">
                   {/* Stat cards */}
                   <div className="bg-primary/5 rounded-2xl p-6 hover:bg-primary/10 transition-colors duration-300">
-                    <div className="text-4xl font-bold text-primary mb-2">98%</div>
+                    <div className="text-4xl font-bold text-primary mb-2">{stats.clients_satisfied}%</div>
                     <div className="text-sm text-muted-foreground">Client Satisfaction</div>
                   </div>
                   <div className="bg-primary/5 rounded-2xl p-6 hover:bg-primary/10 transition-colors duration-300">
-                    <div className="text-4xl font-bold text-primary mb-2">500+</div>
+                    <div className="text-4xl font-bold text-primary mb-2">{stats.projects_delivered}+</div>
                     <div className="text-sm text-muted-foreground">Projects Delivered</div>
                   </div>
                   <div className="bg-primary/5 rounded-2xl p-6 hover:bg-primary/10 transition-colors duration-300">
-                    <div className="text-4xl font-bold text-primary mb-2">50+</div>
+                    <div className="text-4xl font-bold text-primary mb-2">{stats.team_members}+</div>
                     <div className="text-sm text-muted-foreground">Team Members</div>
                   </div>
                   <div className="bg-primary/5 rounded-2xl p-6 hover:bg-primary/10 transition-colors duration-300">
-                    <div className="text-4xl font-bold text-primary mb-2">10+</div>
+                    <div className="text-4xl font-bold text-primary mb-2">{stats.years_experience}+</div>
                     <div className="text-sm text-muted-foreground">Years of Excellence</div>
                   </div>
                 </div>

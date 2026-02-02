@@ -7,8 +7,10 @@ import { Contact } from "@/components/contact"
 import { Footer } from "@/components/footer"
 
 export default function Home() {
+  console.log("[v0] Home page rendering")
+  
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen w-full bg-background">
       <Header />
       <Hero />
       <Services />
