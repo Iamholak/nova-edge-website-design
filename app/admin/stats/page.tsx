@@ -40,18 +40,23 @@ export default function CompanyStatsPage() {
     setIsLoading(true)
     setError(null)
     try {
+      console.log('[v0] Fetching stats...')
       const response = await fetch('/api/admin/stats')
+      console.log('[v0] Response status:', response.status)
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
+        console.error('[v0] API error:', errorData)
         setError(`API Error: ${response.status} - ${errorData?.error || 'Failed to load stats'}`)
         return
       }
       
       const data = await response.json()
+      console.log('[v0] Data received:', data)
       
       // Handle array response
       if (Array.isArray(data.data)) {
+        console.log('[v0] Setting stats from array:', data.data)
         setStats(data.data)
       } else if (data.data && typeof data.data === 'object') {
         // Convert object to array if needed
@@ -60,9 +65,24 @@ export default function CompanyStatsPage() {
           stat_key: key,
           value: typeof value === 'number' ? value : 0
         }))
+        console.log('[v0] Converted to array:', statsArray)
         setStats(statsArray)
+      } else {
+        console.log('[v0] No data found, using defaults')
+        // Set default values if no data
+        setStats([
+          { id: 'clients_satisfied', stat_key: 'clients_satisfied', value: 89 },
+          { id: 'projects_delivered', stat_key: 'projects_delivered', value: 149 },
+          { id: 'team_members', stat_key: 'team_members', value: 23 },
+          { id: 'years_experience', stat_key: 'years_experience', value: 6 },
+          { id: 'clients_served', stat_key: 'clients_served', value: 500 },
+          { id: 'success_rate', stat_key: 'success_rate', value: 98 },
+          { id: 'team_experts', stat_key: 'team_experts', value: 50 },
+          { id: 'years_excellence', stat_key: 'years_excellence', value: 10 },
+        ])
       }
     } catch (error) {
+      console.error('[v0] Fetch error:', error)
       setError(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
       // Set default values on error
       setStats([
