@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { checkAuth } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication
-    const { authenticated } = await checkAuth(request)
-    console.log('[v0] Auth check result:', authenticated)
-    
-    if (!authenticated) {
-      console.log('[v0] User not authenticated')
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     if (!supabaseAdmin) {
       console.error('[v0] Admin client not configured')
       return NextResponse.json({ error: 'Admin client not configured' }, { status: 500 })
@@ -30,8 +20,6 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('[v0] Stats fetched successfully, count:', data?.length)
-    
-    // Return data as array for the admin page to display
     return NextResponse.json({ data: data || [] }, { status: 200 })
   } catch (error) {
     console.error('[v0] API error in GET /api/admin/stats:', error)

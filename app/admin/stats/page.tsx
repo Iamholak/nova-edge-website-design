@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ArrowLeft } from 'lucide-react'
@@ -27,7 +26,6 @@ const statLabels: Record<string, string> = {
 }
 
 export default function CompanyStatsPage() {
-  const router = useRouter()
   const [stats, setStats] = useState<CompanyStat[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -42,31 +40,18 @@ export default function CompanyStatsPage() {
     setIsLoading(true)
     setError(null)
     try {
-      console.log('[v0] Fetching stats from API...')
       const response = await fetch('/api/admin/stats')
-      console.log('[v0] Stats API response status:', response.status)
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        console.error('[v0] Stats API error:', response.status, errorData)
-        
-        if (response.status === 401) {
-          console.log('[v0] Unauthorized - redirecting to login')
-          router.push('/admin/login')
-          return
-        }
-        
-        // Show error message instead of redirecting
         setError(`API Error: ${response.status} - ${errorData?.error || 'Failed to load stats'}`)
         return
       }
       
       const data = await response.json()
-      console.log('[v0] Stats data received:', data)
       
       // Handle array response
       if (Array.isArray(data.data)) {
-        console.log('[v0] Setting stats from array, count:', data.data.length)
         setStats(data.data)
       } else if (data.data && typeof data.data === 'object') {
         // Convert object to array if needed
@@ -75,11 +60,9 @@ export default function CompanyStatsPage() {
           stat_key: key,
           value: typeof value === 'number' ? value : 0
         }))
-        console.log('[v0] Converted object to array, count:', statsArray.length)
         setStats(statsArray)
       }
     } catch (error) {
-      console.error('[v0] Error fetching stats:', error)
       setError(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
       // Set default values on error
       setStats([
