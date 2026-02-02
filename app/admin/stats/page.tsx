@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ArrowLeft } from 'lucide-react'
@@ -27,10 +26,10 @@ const statLabels: Record<string, string> = {
 }
 
 export default function CompanyStatsPage() {
-  const router = useRouter()
   const [stats, setStats] = useState<CompanyStat[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchStats()
@@ -38,28 +37,47 @@ export default function CompanyStatsPage() {
   }, [])
 
   const fetchStats = async () => {
+    setIsLoading(true)
+    setError(null)
     try {
+      console.log('[v0] Fetching stats...')
       const response = await fetch('/api/admin/stats')
+      console.log('[v0] Response status:', response.status)
+      
       if (!response.ok) {
-        router.push('/admin/login')
+        const errorData = await response.json().catch(() => ({}))
+        console.error('[v0] API error:', errorData)
+        setError(`API Error: ${response.status} - ${errorData?.error || 'Failed to load stats'}`)
         return
       }
-      const data = await response.json()
       
-      // Convert stats object to array if needed
-      if (data.data && typeof data.data === 'object' && !Array.isArray(data.data)) {
-        const statsArray = Object.entries(data.data).map(([key, value]) => ({
-          id: key,
-          stat_key: key,
-          value: typeof value === 'number' ? value : 0
-        }))
-        setStats(statsArray)
+      const data = await response.json()
+      console.log('[v0] Data received:', data)
+      
+      // Use defaults if data is empty or not returned
+      const defaultStats = [
+        { id: 'clients_satisfied', stat_key: 'clients_satisfied', value: 89 },
+        { id: 'projects_delivered', stat_key: 'projects_delivered', value: 149 },
+        { id: 'team_members', stat_key: 'team_members', value: 23 },
+        { id: 'years_experience', stat_key: 'years_experience', value: 6 },
+        { id: 'clients_served', stat_key: 'clients_served', value: 500 },
+        { id: 'success_rate', stat_key: 'success_rate', value: 98 },
+        { id: 'team_experts', stat_key: 'team_experts', value: 50 },
+        { id: 'years_excellence', stat_key: 'years_excellence', value: 10 },
+      ]
+      
+      // If data is empty array or invalid, use defaults
+      if (Array.isArray(data.data) && data.data.length > 0) {
+        console.log('[v0] Using stats from API:', data.data)
+        setStats(data.data)
       } else {
-        setStats(Array.isArray(data.data) ? data.data : [])
+        console.log('[v0] API returned empty data, using defaults')
+        setStats(defaultStats)
       }
     } catch (error) {
-      console.error('[v0] Error fetching stats:', error)
-      // Set default values including both old and new stats
+      console.error('[v0] Fetch error:', error)
+      setError(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      // Set default values on error
       setStats([
         { id: 'clients_satisfied', stat_key: 'clients_satisfied', value: 89 },
         { id: 'projects_delivered', stat_key: 'projects_delivered', value: 149 },
@@ -82,22 +100,42 @@ export default function CompanyStatsPage() {
   const handleSaveAll = async () => {
     setIsSaving(true)
     try {
+      console.log('[v0] Saving all stats, count:', stats.length)
+      let successCount = 0
+      let failureCount = 0
+      
       for (const stat of stats) {
-        const response = await fetch(`/api/admin/stats/${stat.stat_key}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ value: stat.value }),
-        })
-        
-        if (!response.ok) {
-          throw new Error(`Failed to update ${stat.stat_key}`)
+        try {
+          console.log(`[v0] Updating ${stat.stat_key} to ${stat.value}`)
+          const response = await fetch(`/api/admin/stats/${stat.stat_key}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: stat.value }),
+          })
+          
+          if (!response.ok) {
+            console.error(`[v0] Failed to update ${stat.stat_key}:`, response.status)
+            failureCount++
+          } else {
+            successCount++
+          }
+        } catch (error) {
+          console.error(`[v0] Error updating ${stat.stat_key}:`, error)
+          failureCount++
         }
       }
-      alert('Statistics updated successfully!')
-      // Reload stats to confirm changes
-      await fetchStats()
+      
+      console.log(`[v0] Save complete: ${successCount} success, ${failureCount} failures`)
+      
+      if (failureCount === 0) {
+        alert('Statistics updated successfully!')
+        // Reload stats to confirm changes
+        await fetchStats()
+      } else {
+        alert(`Updated ${successCount} stats. ${failureCount} failed to update.`)
+      }
     } catch (error) {
-      console.error('Error saving stats:', error)
+      console.error('[v0] Error in save operation:', error)
       alert('Error saving statistics')
     } finally {
       setIsSaving(false)
@@ -122,6 +160,13 @@ export default function CompanyStatsPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {error && (
+          <div className="mb-6 p-4 bg-destructive/10 border border-destructive/50 rounded-xl text-destructive">
+            <p className="font-medium">Error Loading Stats</p>
+            <p className="text-sm mt-1">{error}</p>
+          </div>
+        )}
+        
         {isLoading ? (
           <div className="text-center py-12">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />

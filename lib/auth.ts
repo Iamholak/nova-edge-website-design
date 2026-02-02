@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt'
+import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
 export async function hashPassword(password: string): Promise<string> {
@@ -147,5 +148,43 @@ export async function deleteSession(token: string) {
     }
   } catch (err) {
     console.error('[v0] Exception in deleteSession:', err)
+  }
+}
+
+export async function checkAuth(request: NextRequest) {
+  try {
+    const token = request.cookies.get('admin_session')?.value
+    
+    if (!token) {
+      console.log('[v0] No session token found in cookies')
+      return { authenticated: false, user: null }
+    }
+
+    if (!supabaseAdmin) {
+      console.error('[v0] Admin client not configured')
+      return { authenticated: false, user: null }
+    }
+
+    // Verify the session token exists in the database - don't use .single()
+    const { data, error } = await supabaseAdmin
+      .from('admin_sessions')
+      .select('admin_id, admin_users(email)')
+      .eq('token', token)
+
+    if (error) {
+      console.error('[v0] Database error checking session:', error)
+      return { authenticated: false, user: null }
+    }
+
+    if (!data || data.length === 0) {
+      console.log('[v0] Session token not found in database')
+      return { authenticated: false, user: null }
+    }
+
+    console.log('[v0] Session valid for admin:', data[0].admin_id)
+    return { authenticated: true, user: data[0] }
+  } catch (error) {
+    console.error('[v0] Auth check exception:', error)
+    return { authenticated: false, user: null }
   }
 }

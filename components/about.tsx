@@ -34,28 +34,25 @@ export function About() {
         const response = await fetch('/api/admin/stats')
         const result = await response.json()
         
-        if (result.data) {
-          // Handle both object and array formats
-          if (typeof result.data === 'object' && !Array.isArray(result.data)) {
-            setStats(result.data)
-          } else if (Array.isArray(result.data) && result.data.length > 0) {
-            // Convert array to object if needed
-            const statsObj = result.data.reduce((acc: any, stat: any) => {
-              acc[stat.stat_key] = stat.value
-              return acc
-            }, {})
-            setStats(statsObj)
-          }
+        console.log('[v0] About component fetched stats:', result.data)
+        
+        if (Array.isArray(result.data) && result.data.length > 0) {
+          // Convert array to object
+          const statsObj = result.data.reduce((acc: any, stat: any) => {
+            acc[stat.stat_key] = stat.value
+            return acc
+          }, {})
+          console.log('[v0] Converted to object:', statsObj)
+          setStats(statsObj)
         }
       } catch (err) {
-        console.error('Error fetching stats:', err)
+        console.error('[v0] Error fetching stats:', err)
         // Keep default stats if fetch fails
       }
     }
 
     fetchStats()
     return () => observer.disconnect()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const highlights = [

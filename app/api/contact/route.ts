@@ -37,8 +37,12 @@ export async function POST(request: NextRequest) {
     // Email sending is optional - don't fail if it doesn't work
     try {
       if (resend) {
+        // IMPORTANT: Change 'noreply@yourdomain.com' to your verified Resend email
+        // You can use:
+        // 1. Your domain email (if you verified it in Resend)
+        // 2. Or: onboarding@resend.dev (default test email)
         await resend.emails.send({
-          from: 'noreply@novaedge.com',
+          from: 'onboarding@resend.dev', // ← CHANGE THIS TO YOUR VERIFIED EMAIL
           to: email,
           subject: 'We received your message - NovaEdge Solutions',
           html: `<h2>Thank you for reaching out!</h2><p>Hi ${name},</p><p>We've received your message and will get back to you soon.</p>`,
