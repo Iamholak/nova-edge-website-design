@@ -1,33 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase, supabaseAdmin } from '@/lib/supabase'
-import { getSessionUser } from '@/lib/auth'
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // Get session token from cookie (same as login pattern)
-    const token = request.cookies.get('admin_session')?.value
-    
-    if (!token) {
-      console.log('[v0] No session token found')
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Verify session is valid
-    const user = await getSessionUser(token)
-    if (!user) {
-      console.log('[v0] Invalid or expired session')
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const { value } = await request.json()
     const { id: statKey } = await params
 
     console.log(`[v0] PATCH /api/admin/stats/${statKey} - updating to ${value}`)
 
-    // Use admin client if available, otherwise use regular client
     const client = supabaseAdmin || supabase
 
     // Update using stat_key

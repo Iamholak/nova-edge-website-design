@@ -179,6 +179,11 @@ export default function CompanyStatsPage() {
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-muted-foreground">Loading statistics...</p>
           </div>
+        ) : stats.length === 0 ? (
+          <div className="bg-card rounded-2xl p-12 border border-border text-center">
+            <p className="text-muted-foreground mb-4">No statistics found. Using default values.</p>
+            <Button onClick={() => fetchStats()}>Reload Stats</Button>
+          </div>
         ) : (
           <div className="space-y-8">
             {stats.map((stat) => (
