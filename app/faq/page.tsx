@@ -40,7 +40,7 @@ export default function FAQPage() {
     {
       question: 'What if I need to make changes during a project?',
       answer:
-        'We understand that needs can change. We build in flexibility for reasonable adjustments. Any significant scope changes may affect timeline and cost, which we'll discuss transparently.',
+        "We understand that needs can change. We build in flexibility for reasonable adjustments. Any significant scope changes may affect timeline and cost, which we'll discuss transparently.",
     },
     {
       question: 'How do I get started?',
