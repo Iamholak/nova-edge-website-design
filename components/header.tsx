@@ -23,7 +23,18 @@ export function Header() {
     { href: "#services", label: "Services" },
     { href: "#about", label: "About" },
     { href: "#why-us", label: "Why Us" },
-    { href: "#contact", label: "Contact" },
+    { href: "/blog", label: "Blog" },
+  ]
+
+  const footerLinks = [
+    { href: "/about", label: "About Us" },
+    { href: "/careers", label: "Careers" },
+    { href: "/blog", label: "Blog" },
+    { href: "/press", label: "Press" },
+    { href: "/faq", label: "FAQ" },
+    { href: "/privacy", label: "Privacy" },
+    { href: "/terms", label: "Terms" },
+    { href: "/contact", label: "Contact" },
   ]
 
   return (

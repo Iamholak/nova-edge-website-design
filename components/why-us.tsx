@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
-import { Lightbulb, Target, Rocket, Users, ArrowUpRight } from "lucide-react"
+import { Lightbulb, Target, Rocket, Users, ArrowUpRight, Send } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 const reasons = [
   {
@@ -30,6 +33,7 @@ const reasons = [
 export function WhyUs() {
   const sectionRef = useRef<HTMLElement>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -47,6 +51,40 @@ export function WhyUs() {
 
     return () => observer.disconnect()
   }, [])
+
+  const handleProjectSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsSubmittingForm(true)
+
+    try {
+      const formData = new FormData(e.currentTarget)
+      const response = await fetch('/api/project-inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.get('name'),
+          email: formData.get('email'),
+          company: formData.get('company'),
+          phone: formData.get('phone'),
+          projectDescription: formData.get('projectDescription'),
+          budget: formData.get('budget'),
+          timeline: formData.get('timeline'),
+        }),
+      })
+
+      if (response.ok) {
+        alert('Project inquiry submitted successfully! We will get back to you soon.')
+        ;(e.target as HTMLFormElement).reset()
+      } else {
+        alert('Failed to submit inquiry. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error submitting project inquiry:', error)
+      alert('Error submitting inquiry. Please try again.')
+    } finally {
+      setIsSubmittingForm(false)
+    }
+  }
 
   return (
     <section id="why-us" ref={sectionRef} className="py-24 relative overflow-hidden">
@@ -106,6 +144,132 @@ export function WhyUs() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Project Inquiry Form */}
+        <div className={cn(
+          "mt-20 max-w-3xl mx-auto transition-all duration-700",
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        )}>
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-foreground mb-4">Tell Us About Your Project</h3>
+            <p className="text-muted-foreground">
+              Ready to get started? Share your project details and let's create something amazing together.
+            </p>
+          </div>
+
+          <form onSubmit={handleProjectSubmit} className="bg-card rounded-3xl p-8 border border-border shadow-xl">
+            <div className="space-y-6">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
+                    Your Name
+                  </label>
+                  <Input 
+                    id="name"
+                    name="name"
+                    placeholder="John Doe" 
+                    className="rounded-xl border-border focus:border-primary focus:ring-primary/20"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+                    Email
+                  </label>
+                  <Input 
+                    id="email"
+                    name="email"
+                    type="email" 
+                    placeholder="john@example.com" 
+                    className="rounded-xl border-border focus:border-primary focus:ring-primary/20"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="company" className="block text-sm font-medium text-foreground mb-2">
+                    Company
+                  </label>
+                  <Input 
+                    id="company"
+                    name="company"
+                    placeholder="Your Company" 
+                    className="rounded-xl border-border focus:border-primary focus:ring-primary/20"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-2">
+                    Phone (Optional)
+                  </label>
+                  <Input 
+                    id="phone"
+                    name="phone"
+                    placeholder="+1 (555) 123-4567" 
+                    className="rounded-xl border-border focus:border-primary focus:ring-primary/20"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="projectDescription" className="block text-sm font-medium text-foreground mb-2">
+                  Project Details
+                </label>
+                <Textarea 
+                  id="projectDescription"
+                  name="projectDescription"
+                  placeholder="Tell us about your project, goals, and requirements..." 
+                  className="rounded-xl border-border focus:border-primary focus:ring-primary/20 min-h-[150px] resize-none"
+                  required
+                />
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="budget" className="block text-sm font-medium text-foreground mb-2">
+                    Budget Range (Optional)
+                  </label>
+                  <Input 
+                    id="budget"
+                    name="budget"
+                    placeholder="$5,000 - $10,000" 
+                    className="rounded-xl border-border focus:border-primary focus:ring-primary/20"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="timeline" className="block text-sm font-medium text-foreground mb-2">
+                    Timeline (Optional)
+                  </label>
+                  <Input 
+                    id="timeline"
+                    name="timeline"
+                    placeholder="2-3 months" 
+                    className="rounded-xl border-border focus:border-primary focus:ring-primary/20"
+                  />
+                </div>
+              </div>
+
+              <Button 
+                type="submit"
+                disabled={isSubmittingForm}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl py-6 text-lg shadow-lg shadow-primary/25 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 disabled:opacity-70"
+              >
+                {isSubmittingForm ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                    Submitting...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    Submit Project Inquiry
+                    <Send className="w-5 h-5" />
+                  </span>
+                )}
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </section>

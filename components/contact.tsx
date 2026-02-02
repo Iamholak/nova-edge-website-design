@@ -31,12 +31,35 @@ export function Contact() {
     return () => observer.disconnect()
   }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsSubmitting(false)
+
+    try {
+      const formData = new FormData(e.currentTarget)
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.get('name'),
+          email: formData.get('email'),
+          subject: formData.get('subject'),
+          message: formData.get('message'),
+        }),
+      })
+
+      if (response.ok) {
+        alert('Message sent successfully! We will get back to you soon.')
+        ;(e.target as HTMLFormElement).reset()
+      } else {
+        alert('Failed to send message. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error sending message:', error)
+      alert('Error sending message. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const contactInfo = [
@@ -110,7 +133,8 @@ export function Contact() {
                       Name
                     </label>
                     <Input 
-                      id="name" 
+                      id="name"
+                      name="name"
                       placeholder="John Doe" 
                       className="rounded-xl border-border focus:border-primary focus:ring-primary/20"
                       required
@@ -121,7 +145,8 @@ export function Contact() {
                       Email
                     </label>
                     <Input 
-                      id="email" 
+                      id="email"
+                      name="email"
                       type="email" 
                       placeholder="john@example.com" 
                       className="rounded-xl border-border focus:border-primary focus:ring-primary/20"
@@ -134,7 +159,8 @@ export function Contact() {
                     Subject
                   </label>
                   <Input 
-                    id="subject" 
+                    id="subject"
+                    name="subject"
                     placeholder="How can we help?" 
                     className="rounded-xl border-border focus:border-primary focus:ring-primary/20"
                     required
@@ -145,7 +171,8 @@ export function Contact() {
                     Message
                   </label>
                   <Textarea 
-                    id="message" 
+                    id="message"
+                    name="message"
                     placeholder="Tell us about your project..." 
                     className="rounded-xl border-border focus:border-primary focus:ring-primary/20 min-h-[150px] resize-none"
                     required

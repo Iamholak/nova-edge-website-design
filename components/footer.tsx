@@ -11,16 +11,16 @@ const footerLinks = {
     { label: "Consulting", href: "#services" },
   ],
   company: [
-    { label: "About Us", href: "#about" },
-    { label: "Careers", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Press", href: "#" },
+    { label: "About Us", href: "/about" },
+    { label: "Careers", href: "/careers" },
+    { label: "Blog", href: "/blog" },
+    { label: "Press", href: "/press" },
   ],
   support: [
-    { label: "Contact", href: "#contact" },
-    { label: "FAQ", href: "#" },
-    { label: "Privacy Policy", href: "#" },
-    { label: "Terms of Service", href: "#" },
+    { label: "Contact", href: "/contact" },
+    { label: "FAQ", href: "/faq" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
   ],
 }
 
