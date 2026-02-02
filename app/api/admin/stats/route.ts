@@ -3,56 +3,29 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
-    if (!supabaseAdmin || !supabaseAdmin.from) {
-      return NextResponse.json({ 
-        data: {
-          clients_satisfied: 50,
-          projects_delivered: 120,
-          team_members: 15,
-          years_experience: 5,
-        } 
-      }, { status: 200 })
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Admin client not configured' }, { status: 500 })
     }
 
     const { data, error } = await supabaseAdmin
       .from('company_stats')
-      .select('stat_key, value')
+      .select('*')
+      .order('created_at', { ascending: true })
 
-    if (error || !data) {
-      console.error('[v0] Stats fetch error:', error)
-      return NextResponse.json({ 
-        data: {
-          clients_satisfied: 50,
-          projects_delivered: 120,
-          team_members: 15,
-          years_experience: 5,
-        } 
-      }, { status: 200 })
+    if (error) {
+      console.error('[v0] Error fetching stats:', error)
+      return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 })
     }
 
-    // Convert array of {stat_key, value} to object
-    const stats: any = {}
-    data.forEach((item: any) => {
-      stats[item.stat_key] = item.value
-    })
+    // Convert array to object for easier access on frontend
+    const statsObject = data.reduce((acc: any, stat: any) => {
+      acc[stat.stat_key] = stat.value
+      return acc
+    }, {})
 
-    return NextResponse.json({ 
-      data: {
-        clients_satisfied: stats.clients_satisfied || 50,
-        projects_delivered: stats.projects_delivered || 120,
-        team_members: stats.team_members || 15,
-        years_experience: stats.years_experience || 5,
-      }
-    }, { status: 200 })
+    return NextResponse.json({ data }, { status: 200 })
   } catch (error) {
-    console.error('[v0] Error fetching stats:', error)
-    return NextResponse.json({ 
-      data: {
-        clients_satisfied: 50,
-        projects_delivered: 120,
-        team_members: 15,
-        years_experience: 5,
-      } 
-    }, { status: 200 })
+    console.error('[v0] API error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
