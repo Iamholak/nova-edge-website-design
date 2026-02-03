@@ -9,6 +9,12 @@ import { VideoModal } from "@/components/video-modal"
 export function Hero() {
   const heroRef = useRef<HTMLDivElement>(null)
   const [isVideoOpen, setIsVideoOpen] = useState(false)
+  const [stats, setStats] = useState([
+    { value: "500+", label: "Clients Served" },
+    { value: "98%", label: "Success Rate" },
+    { value: "50+", label: "Team Experts" },
+    { value: "10+", label: "Years Experience" },
+  ])
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -22,6 +28,41 @@ export function Hero() {
     }
     window.addEventListener("mousemove", handleMouseMove)
     return () => window.removeEventListener("mousemove", handleMouseMove)
+  }, [])
+
+  useEffect(() => {
+    // Fetch stats from API
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('/api/admin/stats')
+        const result = await response.json()
+        
+        if (Array.isArray(result.data) && result.data.length > 0) {
+          // Map API data to display format
+          const statLabels: Record<string, string> = {
+            clients_served: 'Clients Served',
+            success_rate: 'Success Rate',
+            team_experts: 'Team Experts',
+            years_excellence: 'Years Experience',
+          }
+          
+          const apiStats = result.data
+            .filter((stat: any) => ['clients_served', 'success_rate', 'team_experts', 'years_excellence'].includes(stat.stat_key))
+            .map((stat: any) => ({
+              value: stat.stat_key === 'success_rate' ? `${stat.value}%` : `${stat.value}+`,
+              label: statLabels[stat.stat_key] || stat.stat_key,
+            }))
+          
+          if (apiStats.length > 0) {
+            setStats(apiStats)
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching stats:', err)
+      }
+    }
+
+    fetchStats()
   }, [])
 
   return (
@@ -110,12 +151,7 @@ export function Hero() {
 
         {/* Stats */}
         <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 animate-fade-in-up" style={{ animationDelay: "0.6s" }}>
-          {[
-            { value: "500+", label: "Clients Served" },
-            { value: "98%", label: "Success Rate" },
-            { value: "50+", label: "Team Experts" },
-            { value: "10+", label: "Years Experience" },
-          ].map((stat, index) => (
+          {stats.map((stat, index) => (
             <div key={index} className="text-center group">
               <div className="text-3xl sm:text-4xl font-bold text-foreground mb-1 transition-transform duration-300 group-hover:scale-110 dark:text-cyan-300 dark:drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">
                 {stat.value}
