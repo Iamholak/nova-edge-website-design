@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
     // Try to store in database - PRIMARY METHOD
     try {
       console.log('[v0] Attempting to save to database...')
+      console.log('[v0] Payload:', { name, email, subject, message })
       const { data, error } = await supabase
         .from('contact_messages')
         .insert({
@@ -40,8 +41,11 @@ export async function POST(request: NextRequest) {
         .select()
 
       if (error) {
-        console.error('[v0] Database error:', error)
-        errors.push(`Database error: ${error.message}`)
+        console.error('[v0] Database error - Full error object:', JSON.stringify(error, null, 2))
+        console.error('[v0] Database error - Code:', error.code)
+        console.error('[v0] Database error - Message:', error.message)
+        console.error('[v0] Database error - Details:', error.details)
+        errors.push(`Database error: ${error.message} (${error.code})`)
       } else {
         console.log('[v0] ✓ Message saved to database:', data)
         dbSaved = true
@@ -49,6 +53,7 @@ export async function POST(request: NextRequest) {
     } catch (dbError) {
       const errorMsg = dbError instanceof Error ? dbError.message : String(dbError)
       console.error('[v0] Database operation error:', errorMsg)
+      console.error('[v0] Database operation error stack:', dbError)
       errors.push(`Database error: ${errorMsg}`)
     }
 
