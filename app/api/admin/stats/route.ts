@@ -1,27 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase, supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('[v0] GET /api/admin/stats')
-    console.log('[v0] supabaseAdmin is dummy?', !supabaseAdmin?.from || typeof supabaseAdmin.from !== 'function')
-    
-    // Always use admin client for getting stats
+    // Query the stats table directly
     const { data, error } = await supabaseAdmin
       .from('company_stats')
       .select('*')
-      .order('created_at', { ascending: true })
-
-    console.log('[v0] Query result - rows:', data?.length, 'error:', error?.message)
+      .order('stat_key', { ascending: true })
 
     if (error) {
-      console.error('[v0] Database error:', error.message)
+      console.error('[v0] Stats query error:', error)
       return NextResponse.json({ data: [] }, { status: 200 })
     }
 
+    console.log('[v0] Stats fetched:', data?.length || 0, 'rows')
     return NextResponse.json({ data: data || [] }, { status: 200 })
   } catch (error) {
-    console.error('[v0] Exception:', error)
+    console.error('[v0] Stats API error:', error)
     return NextResponse.json({ data: [] }, { status: 200 })
   }
 }

@@ -100,42 +100,24 @@ export default function CompanyStatsPage() {
   const handleSaveAll = async () => {
     setIsSaving(true)
     try {
-      console.log('[v0] Saving all stats, count:', stats.length)
-      let successCount = 0
-      let failureCount = 0
-      
       for (const stat of stats) {
-        try {
-          console.log(`[v0] Updating ${stat.stat_key} to ${stat.value}`)
-          const response = await fetch(`/api/admin/stats/${stat.stat_key}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ value: stat.value }),
-          })
-          
-          if (!response.ok) {
-            console.error(`[v0] Failed to update ${stat.stat_key}:`, response.status)
-            failureCount++
-          } else {
-            successCount++
-          }
-        } catch (error) {
-          console.error(`[v0] Error updating ${stat.stat_key}:`, error)
-          failureCount++
+        const response = await fetch(`/api/admin/stats/${stat.stat_key}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ value: stat.value }),
+        })
+        
+        const result = await response.json()
+        if (!result.success) {
+          console.error(`Failed to update ${stat.stat_key}`)
         }
       }
       
-      console.log(`[v0] Save complete: ${successCount} success, ${failureCount} failures`)
-      
-      if (failureCount === 0) {
-        alert('Statistics updated successfully!')
-        // Reload stats to confirm changes
-        await fetchStats()
-      } else {
-        alert(`Updated ${successCount} stats. ${failureCount} failed to update.`)
-      }
+      alert('Statistics saved successfully!')
+      // Fetch fresh data from database
+      await fetchStats()
     } catch (error) {
-      console.error('[v0] Error in save operation:', error)
+      console.error('[v0] Save error:', error)
       alert('Error saving statistics')
     } finally {
       setIsSaving(false)

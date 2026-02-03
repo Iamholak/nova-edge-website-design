@@ -9,24 +9,22 @@ export async function PATCH(
     const { value } = await request.json()
     const { id: statKey } = await params
 
-    console.log(`[v0] PATCH /api/admin/stats/${statKey} - updating to ${value}`)
-
-    // Use admin client for writes
+    // Update the stat
     const { data, error } = await supabaseAdmin
       .from('company_stats')
-      .update({ value, updated_at: new Date().toISOString() })
+      .update({ value })
       .eq('stat_key', statKey)
       .select()
 
     if (error) {
-      console.error('[v0] Database error updating stat:', error)
-      return NextResponse.json({ error: 'Failed to update stat', data: null }, { status: 200 })
+      console.error('[v0] Update error:', error)
+      return NextResponse.json({ success: false, error: String(error) }, { status: 200 })
     }
 
-    console.log(`[v0] Stat ${statKey} updated successfully, rows affected:`, data?.length)
-    return NextResponse.json({ data, success: true }, { status: 200 })
+    console.log('[v0] Updated stat:', statKey, 'to', value)
+    return NextResponse.json({ success: true, data }, { status: 200 })
   } catch (error) {
-    console.error('[v0] Error in PATCH /api/admin/stats:', error)
-    return NextResponse.json({ error: 'Internal server error', data: null }, { status: 200 })
+    console.error('[v0] PATCH error:', error)
+    return NextResponse.json({ success: false, error: String(error) }, { status: 200 })
   }
 }
