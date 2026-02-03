@@ -34,20 +34,16 @@ export function About() {
         const response = await fetch('/api/admin/stats')
         const result = await response.json()
         
-        console.log('[v0] About component fetched stats:', result.data)
-        
         if (Array.isArray(result.data) && result.data.length > 0) {
           // Convert array to object
           const statsObj = result.data.reduce((acc: any, stat: any) => {
             acc[stat.stat_key] = stat.value
             return acc
           }, {})
-          console.log('[v0] Converted to object:', statsObj)
           setStats(statsObj)
         }
       } catch (err) {
-        console.error('[v0] Error fetching stats:', err)
-        // Keep default stats if fetch fails
+        console.error('Error fetching stats:', err)
       }
     }
 
