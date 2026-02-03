@@ -55,11 +55,19 @@ export function Contact() {
       const result = await response.json()
       console.log('[v0] Contact response:', { status: response.status, body: result })
 
-      if (response.ok && result.success) {
-        alert(`✓ Message sent successfully!\nDatabase saved: ${result.dbSaved}\nEmail sent: ${result.emailSent}`)
+      if (result.success) {
+        let message = '✓ Message sent successfully!\n'
+        if (result.dbSaved) message += '✓ Saved to database\n'
+        if (result.emailSent) message += '✓ Email sent to you\n'
+        if (result.errors?.length) message += '\n⚠ Warnings:\n' + result.errors.join('\n')
+        
+        alert(message)
         ;(e.target as HTMLFormElement).reset()
       } else {
-        const errorMsg = result.details || result.error || 'Unknown error'
+        let errorMsg = result.error || 'Unknown error'
+        if (result.errors?.length) {
+          errorMsg += '\n\nDetails:\n' + result.errors.join('\n')
+        }
         console.error('[v0] Server returned error:', result)
         alert(`Failed to send message:\n${errorMsg}`)
       }
