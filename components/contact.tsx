@@ -53,14 +53,15 @@ export function Contact() {
       })
 
       const result = await response.json()
-      console.log('[v0] Contact response:', { status: response.status, data: result })
+      console.log('[v0] Contact response:', { status: response.status, body: result })
 
-      if (response.ok) {
-        alert('Message sent successfully! We will get back to you soon.')
+      if (response.ok && result.success) {
+        alert(`✓ Message sent successfully!\nDatabase saved: ${result.dbSaved}\nEmail sent: ${result.emailSent}`)
         ;(e.target as HTMLFormElement).reset()
       } else {
-        console.error('[v0] Server error:', result)
-        alert(`Failed to send message: ${result.error || 'Please try again.'}`)
+        const errorMsg = result.details || result.error || 'Unknown error'
+        console.error('[v0] Server returned error:', result)
+        alert(`Failed to send message:\n${errorMsg}`)
       }
     } catch (error) {
       console.error('[v0] Error sending message:', error)

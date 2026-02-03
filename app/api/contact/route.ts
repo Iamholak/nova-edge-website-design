@@ -7,6 +7,8 @@ export async function POST(request: NextRequest) {
     const { name, email, subject, message } = await request.json()
 
     console.log('[v0] Contact form submitted:', { name, email, subject })
+    console.log('[v0] Environment check - Supabase URL:', !!process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.log('[v0] Environment check - Resend API Key:', !!process.env.RESEND_API_KEY)
 
     // Validate input
     if (!name || !email || !subject || !message) {
@@ -17,13 +19,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if Supabase is configured
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      console.error('[v0] Supabase not configured - skipping database storage')
-      // Continue with email even if database is not available
-    } else {
+    let dbSaved = false
+    let emailSent = false
+
+    // Try to store in database
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       try {
-        // Store in database - this is the primary goal
+        console.log('[v0] Attempting to save to database...')
         const { data, error } = await supabase
           .from('contact_messages')
           .insert({
@@ -37,20 +39,20 @@ export async function POST(request: NextRequest) {
 
         if (error) {
           console.error('[v0] Database error:', error)
-          // Don't fail if database insert fails - still try to send email
         } else {
           console.log('[v0] Message saved to database:', data)
+          dbSaved = true
         }
       } catch (dbError) {
         console.error('[v0] Database operation error:', dbError)
-        // Continue - database is not critical
       }
+    } else {
+      console.warn('[v0] Supabase not configured - set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY')
     }
 
-    // Email sending is optional - don't fail if it doesn't work
-    let emailSent = false
-    try {
-      if (resend && process.env.RESEND_API_KEY) {
+    // Try to send email via Resend
+    if (process.env.RESEND_API_KEY) {
+      try {
         console.log('[v0] Attempting to send email via Resend...')
         const emailResult = await resend.emails.send({
           from: 'onboarding@resend.dev',
@@ -58,20 +60,34 @@ export async function POST(request: NextRequest) {
           subject: 'We received your message - NovaEdge Solutions',
           html: `<h2>Thank you for reaching out!</h2><p>Hi ${name},</p><p>We've received your message and will get back to you soon.</p>`,
         })
-        console.log('[v0] Email sent:', emailResult)
+        console.log('[v0] Email send response:', emailResult)
         emailSent = true
-      } else {
-        console.warn('[v0] Resend not configured - API key or client missing')
+      } catch (emailError) {
+        console.error('[v0] Email sending error:', emailError)
       }
-    } catch (emailError) {
-      console.error('[v0] Email sending error:', emailError)
-      // Silently fail - email is not critical
+    } else {
+      console.warn('[v0] Resend not configured - set RESEND_API_KEY in environment variables')
+    }
+
+    // Check if anything actually succeeded
+    if (!dbSaved && !emailSent) {
+      console.error('[v0] Neither database nor email was configured/successful')
+      return NextResponse.json(
+        { 
+          error: 'No delivery method available',
+          details: 'Please configure either Supabase or Resend',
+          supabaseConfigured: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+          resendConfigured: !!process.env.RESEND_API_KEY,
+        },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json(
       { 
         success: true, 
         message: 'Message received successfully',
+        dbSaved,
         emailSent,
       },
       { status: 201 }
