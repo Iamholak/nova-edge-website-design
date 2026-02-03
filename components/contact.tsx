@@ -56,10 +56,12 @@ export function Contact() {
       console.log('[v0] Contact response:', { status: response.status, body: result })
 
       if (result.success) {
-        let message = '✓ Message sent successfully!\n'
-        if (result.dbSaved) message += '✓ Saved to database\n'
-        if (result.emailSent) message += '✓ Email sent to you\n'
-        if (result.errors?.length) message += '\n⚠ Warnings:\n' + result.errors.join('\n')
+        let message = '✓ Your message has been saved successfully!\n\n'
+        if (result.dbSaved) message += '✓ Message stored in our database\n'
+        if (result.emailSent) message += '✓ Confirmation email sent\n'
+        if (result.warnings?.length) {
+          message += '\n' + result.warnings.join('\n')
+        }
         
         alert(message)
         ;(e.target as HTMLFormElement).reset()
@@ -69,7 +71,7 @@ export function Contact() {
           errorMsg += '\n\nDetails:\n' + result.errors.join('\n')
         }
         console.error('[v0] Server returned error:', result)
-        alert(`Failed to send message:\n${errorMsg}`)
+        alert(`Failed to save your message:\n${errorMsg}`)
       }
     } catch (error) {
       console.error('[v0] Error sending message:', error)
