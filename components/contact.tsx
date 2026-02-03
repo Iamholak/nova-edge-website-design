@@ -37,22 +37,30 @@ export function Contact() {
 
     try {
       const formData = new FormData(e.currentTarget)
+      const data = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        subject: formData.get('subject'),
+        message: formData.get('message'),
+      }
+
+      console.log('[v0] Sending contact form:', data)
+
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.get('name'),
-          email: formData.get('email'),
-          subject: formData.get('subject'),
-          message: formData.get('message'),
-        }),
+        body: JSON.stringify(data),
       })
+
+      const result = await response.json()
+      console.log('[v0] Contact response:', { status: response.status, data: result })
 
       if (response.ok) {
         alert('Message sent successfully! We will get back to you soon.')
         ;(e.target as HTMLFormElement).reset()
       } else {
-        alert('Failed to send message. Please try again.')
+        console.error('[v0] Server error:', result)
+        alert(`Failed to send message: ${result.error || 'Please try again.'}`)
       }
     } catch (error) {
       console.error('[v0] Error sending message:', error)
