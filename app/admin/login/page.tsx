@@ -23,19 +23,22 @@ export default function AdminLoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
+        credentials: 'include', // Ensure cookies are included
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        const data = await response.json()
         setError(data.error || 'Login failed')
+        setIsLoading(false)
         return
       }
 
+      // Login successful - redirect to dashboard
       router.push('/admin/dashboard')
     } catch (err) {
+      console.error('[v0] Login error:', err)
       setError('An error occurred. Please try again.')
-      console.error(err)
-    } finally {
       setIsLoading(false)
     }
   }
