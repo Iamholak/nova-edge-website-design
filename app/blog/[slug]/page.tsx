@@ -105,10 +105,92 @@ export default function BlogPostPage() {
           </header>
 
           <div className="prose prose-invert max-w-none bg-card rounded-2xl p-8 border border-border">
-            <div className="text-foreground leading-relaxed whitespace-pre-wrap break-words">
-              {post.content}
-            </div>
+            <div 
+              className="text-foreground leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+              style={{
+                fontSize: '16px',
+                lineHeight: '1.6',
+              }}
+            />
           </div>
+
+          <style jsx>{`
+            :global(div[dangerously-set]) h1 {
+              font-size: 32px;
+              font-weight: bold;
+              margin: 24px 0 16px 0;
+              color: inherit;
+            }
+            :global(div[dangerously-set]) h2 {
+              font-size: 24px;
+              font-weight: bold;
+              margin: 20px 0 12px 0;
+              color: inherit;
+            }
+            :global(div[dangerously-set]) p {
+              margin: 12px 0;
+              color: inherit;
+            }
+            :global(div[dangerously-set]) ul {
+              margin: 12px 0;
+              padding-left: 24px;
+              list-style-type: disc;
+            }
+            :global(div[dangerously-set]) ol {
+              margin: 12px 0;
+              padding-left: 24px;
+              list-style-type: decimal;
+            }
+            :global(div[dangerously-set]) li {
+              margin: 8px 0;
+              color: inherit;
+            }
+            :global(div[dangerously-set]) a {
+              color: hsl(var(--primary));
+              text-decoration: underline;
+              cursor: pointer;
+              transition: opacity 0.2s ease;
+            }
+            :global(div[dangerously-set]) a:hover {
+              opacity: 0.8;
+            }
+            :global(div[dangerously-set]) pre {
+              background-color: hsl(var(--muted));
+              color: hsl(var(--foreground));
+              padding: 16px;
+              border-radius: 8px;
+              overflow-x: auto;
+              margin: 16px 0;
+              font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+              font-size: 14px;
+              line-height: 1.5;
+            }
+            :global(div[dangerously-set]) code {
+              background-color: hsl(var(--muted));
+              color: hsl(var(--foreground));
+              padding: 2px 6px;
+              border-radius: 4px;
+              font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+              font-size: 14px;
+            }
+            :global(div[dangerously-set]) pre code {
+              background-color: transparent;
+              padding: 0;
+              color: inherit;
+            }
+            :global(div[dangerously-set]) img {
+              max-width: 100%;
+              height: auto;
+              border-radius: 8px;
+              margin: 16px 0;
+            }
+            :global(div[dangerously-set]) b,
+            :global(div[dangerously-set]) strong {
+              font-weight: bold;
+              color: inherit;
+            }
+          `}</style>
 
           <div className="mt-12 pt-8 border-t border-border">
             <Link href="/blog">
